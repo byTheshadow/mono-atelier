@@ -80,6 +80,37 @@
       stroke-width: 2;
     }
 
+    /* 清空草稿按钮 */
+    .reset-btn {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+      z-index: 10;
+    }
+
+    .reset-btn:hover {
+      background: rgba(255, 90, 90, 0.15);
+      border-color: rgba(255, 90, 90, 0.3);
+      color: #ff8888;
+    }
+
+    .reset-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
     /* 问卷主卡片 */
     .survey-container {
       width: 100%;
@@ -102,54 +133,70 @@
 
     .survey-header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
     }
 
     .survey-title {
       font-family: 'Cinzel', serif;
-      font-size: 1.5rem;
-      letter-spacing: 4px;
-      font-weight: 400;
+      font-size: 1.8rem;
+      letter-spacing: 6px;
+      font-weight: 600;
       margin-bottom: 8px;
     }
 
     .survey-subtitle {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
-      letter-spacing: 3px;
-      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* 草稿已恢复提示条 */
+    .draft-notice {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 25px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .draft-notice.active {
+      display: flex;
     }
 
     /* ==========================================================================
-       2. 表单元素设计
+       2. 表单控件样式
        ========================================================================== */
     .form-group {
-      margin-bottom: 35px;
+      margin-bottom: 30px;
     }
 
     .question-label {
+      display: block;
       font-size: 0.9rem;
       font-weight: 600;
-      letter-spacing: 1px;
       margin-bottom: 8px;
-      color: var(--text-primary);
-      display: block;
+      letter-spacing: 1px;
     }
 
     .question-desc {
       font-size: 0.75rem;
       color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      line-height: 1.5;
     }
 
-    /* 统一的极简输入框样式 */
+    /* 输入框统一风格 */
     .form-input, .form-textarea {
       width: 100%;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 16px;
       color: var(--text-primary);
       font-family: inherit;
       font-size: 0.85rem;
@@ -158,25 +205,25 @@
     }
 
     .form-input:focus, .form-textarea:focus {
-      border-color: rgba(255, 255, 255, 0.4);
-      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.06);
     }
 
     .form-textarea {
-      height: 100px;
-      resize: none;
+      resize: vertical;
+      min-height: 90px;
     }
 
-    /* 问题1：专属昵称切换按钮 */
-    .nickname-preset {
+    /* 快捷切换标签（专属昵称） */
+    .preset-container {
       display: flex;
       gap: 10px;
       margin-bottom: 10px;
     }
 
     .preset-btn {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       color: var(--text-secondary);
       padding: 8px 16px;
       border-radius: 20px;
@@ -185,50 +232,57 @@
       transition: var(--transition-smooth);
     }
 
-    .preset-btn.active {
+    .preset-btn:hover, .preset-btn.active {
       background: var(--text-primary);
       color: var(--bg-dark);
       border-color: var(--text-primary);
     }
 
-    /* 问题4：地址婉拒选项样式 */
-    .decline-option {
+    /* 自定义 Checkbox 组合控制框 */
+    .decline-option, .card-generation-toggle {
       display: flex;
       align-items: center;
-      margin-top: 10px;
       cursor: pointer;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
       user-select: none;
     }
 
-    .decline-option input {
+    .decline-option {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .decline-option input, .card-generation-toggle input {
       display: none;
     }
 
     .custom-checkbox {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 3px;
-      margin-right: 8px;
-      display: flex;
+      border-radius: 4px;
+      margin-right: 10px;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
       transition: var(--transition-smooth);
+      flex-shrink: 0;
     }
 
-    .decline-option input:checked + .custom-checkbox {
+    /* 已勾选的视觉响应（支持两种 toggle） */
+    .decline-option input:checked + .custom-checkbox,
+    .card-generation-toggle input:checked + .custom-checkbox {
       background: var(--text-primary);
       border-color: var(--text-primary);
     }
 
-    .decline-option input:checked + .custom-checkbox::after {
+    .decline-option input:checked + .custom-checkbox::after,
+    .card-generation-toggle input:checked + .custom-checkbox::after {
       content: '';
       width: 6px;
       height: 3px;
-      border-left: 1.5px solid var(--bg-dark);
-      border-bottom: 1.5px solid var(--bg-dark);
+      border-left: 2px solid var(--bg-dark);
+      border-bottom: 2px solid var(--bg-dark);
       transform: rotate(-45deg) translate(0.5px, -0.5px);
     }
 
@@ -237,17 +291,20 @@
       text-decoration: line-through rgba(255, 255, 255, 0.4);
     }
 
-    /* 生成选项框 */
+    /* 生成选项框专用样式 */
     .card-generation-toggle {
-      display: flex;
-      align-items: center;
       margin-bottom: 30px;
-      cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      transition: var(--transition-smooth);
     }
-    
-    .card-generation-toggle input {
-      display: none;
+
+    .card-generation-toggle:hover {
+      background: rgba(255, 255, 255, 0.06);
     }
 
     /* 结语文本 */
@@ -286,6 +343,12 @@
       transform: translateY(-2px);
     }
 
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     /* ==========================================================================
        3. 隐藏生成区（html2canvas 用于渲染的卡片模板，放在屏幕外）
        ========================================================================== */
@@ -295,208 +358,233 @@
       top: 0;
     }
 
-    /* 卡片一：问卷单（极简冷淡设计报告风格） */
+    /* 模板 1: 极简画室问卷档案卡 (MONO ARCHIVE) */
     #receipt-template {
-      width: 480px;
-      background: #ffffff;
-      color: #121212;
-      padding: 40px;
+      width: 420px;
+      background: #0d0d0f;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 40px 35px;
       font-family: 'Noto Serif SC', serif;
       box-sizing: border-box;
     }
 
     .receipt-title {
       font-family: 'Cinzel', serif;
-      font-size: 1.3rem;
-      letter-spacing: 5px;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
       text-align: center;
-      border-bottom: 2px solid #121212;
-      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 20px;
       margin-bottom: 25px;
     }
 
     .receipt-row {
-      border-bottom: 1px solid #e5e5e5;
-      padding: 15px 0;
-      font-size: 0.85rem;
+      margin-bottom: 20px;
     }
 
     .receipt-row-title {
-      font-weight: 600;
-      color: #666;
-      margin-bottom: 5px;
-      font-size: 0.75rem;
-      letter-spacing: 1px;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      font-family: 'Cinzel', serif;
     }
 
     .receipt-row-value {
+      font-size: 0.85rem;
       line-height: 1.6;
-      color: #121212;
-      text-align: justify;
+      white-space: pre-wrap;
     }
 
-    /* 卡片二：预约单（极简信封卡片风格） */
+    .receipt-footer {
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      padding-top: 20px;
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* 模板 2: MONO 专线车票与招待信 (TICKET & INVITATION) */
     #booking-template {
-      width: 480px;
-      height: 320px;
-      background: #f3f2ee; /* 微微泛黄的信封纸张色 */
-      color: #2b2b2b;
-      padding: 30px;
+      width: 600px;
+      background: #0a0a0c;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 0;
       font-family: 'Noto Serif SC', serif;
-      position: relative;
-      border: 1px solid #d2cfc9;
       box-sizing: border-box;
+      display: flex;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .envelope-border {
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      height: 100%;
-      width: 100%;
-      padding: 25px;
-      box-sizing: border-box;
+    /* 左侧：专线车票 */
+    .ticket-left {
+      width: 220px;
+      padding: 30px 20px;
+      border-right: 1px dashed rgba(255, 255, 255, 0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* 车票打孔缺口 */
+    .ticket-left::before, .ticket-left::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      width: 20px;
+      height: 20px;
+      background: #08080a;
+      border-radius: 50%;
+    }
+    .ticket-left::before { top: -10px; }
+    .ticket-left::after { bottom: -10px; }
+
+    .ticket-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .ticket-route {
+      margin: 25px 0;
+    }
+
+    .ticket-station {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    .ticket-arrow {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.3);
+      margin: 6px 0;
+      font-family: 'Cinzel', serif;
+    }
+
+    .ticket-barcode {
+      font-family: monospace;
+      letter-spacing: 4px;
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.3);
+      margin-top: 15px;
+    }
+
+    /* 右侧：招待信与蜡印 */
+    .ticket-right {
+      flex: 1;
+      padding: 35px 30px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
     }
 
-    /* 矢量邮戳 */
-    .postmark-svg {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 70px;
-      height: 70px;
-      opacity: 0.75;
-    }
-
-    .envelope-header {
+    .letter-title {
       font-family: 'Cinzel', serif;
-      font-size: 0.75rem;
+      font-size: 0.9rem;
       letter-spacing: 3px;
-      color: #8a8882;
+      margin-bottom: 20px;
     }
 
-    .envelope-body {
-      margin-top: 15px;
-    }
-
-    .envelope-to {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      border-bottom: 1px dashed #b5b2a9;
-      padding-bottom: 5px;
-      display: inline-block;
-    }
-
-    .envelope-message {
+    .letter-body {
       font-size: 0.8rem;
       line-height: 1.8;
-      letter-spacing: 1px;
-      color: #4a4945;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 25px;
     }
 
-    .envelope-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-
-    /* 极简火漆蜡印 SVG */
-    .wax-seal-svg {
-      width: 42px;
-      height: 42px;
-      opacity: 0.85;
-    }
-
-    .envelope-signature {
-      font-family: 'Cinzel', serif;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
+    .letter-signature {
       text-align: right;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
     }
 
-    .envelope-signature span {
-      display: block;
-      font-size: 0.6rem;
-      color: #8a8882;
-      margin-top: 4px;
+    /* 矢量火漆 Wax Seal 装饰 */
+    .wax-seal {
+      position: absolute;
+      bottom: 25px;
+      right: 35px;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.4);
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
     }
 
     /* ==========================================================================
-       4. 结果展示模态弹窗（毛玻璃）
+       4. 结果弹窗 Modal
        ========================================================================== */
-    .modal-overlay {
+    .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(5, 5, 7, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: var(--transition-smooth);
+      z-index: 100;
       padding: 20px;
     }
 
-    .modal-overlay.active {
+    .modal-backdrop.active {
       opacity: 1;
       pointer-events: auto;
     }
 
     .modal-content {
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      background: rgba(20, 20, 25, 0.6);
+      background: rgba(18, 18, 22, 0.95);
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 25px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
       overflow-y: auto;
-      transform: scale(0.9);
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-overlay.active .modal-content {
-      transform: scale(1);
-    }
-
-    .modal-header {
       text-align: center;
-      margin-bottom: 20px;
     }
 
     .modal-title {
-      font-size: 0.95rem;
+      font-size: 1rem;
       letter-spacing: 2px;
-      font-weight: 400;
+      margin-bottom: 6px;
     }
 
-    .modal-desc {
+    .modal-subtitle {
       font-size: 0.75rem;
       color: var(--text-secondary);
-      margin-top: 5px;
+      margin-bottom: 20px;
     }
 
-    /* 渲染出来的图片展示区域 */
     .output-gallery {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 20px;
       margin-bottom: 25px;
     }
 
     .output-img-wrapper {
-      width: 100%;
-      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      background: #000;
     }
 
     .output-img-wrapper img {
@@ -508,8 +596,9 @@
       font-size: 0.65rem;
       color: var(--text-secondary);
       text-align: center;
-      margin-top: 6px;
+      padding: 8px;
       letter-spacing: 1px;
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .close-modal-btn {
@@ -533,9 +622,14 @@
 </head>
 <body>
 
-  <!-- 1. 返回主页 -->
+  <!-- 1. 顶部操作工具栏 -->
   <button class="back-btn" onclick="location.href='./index.html'" title="返回主页">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+  </button>
+
+  <button class="reset-btn" id="reset-draft-btn" title="清空草稿并重置表单" onclick="clearDraft()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+    重置
   </button>
 
   <!-- 2. 问卷核心区域 -->
@@ -545,47 +639,50 @@
       <p class="survey-subtitle">预约问卷信息</p>
     </header>
 
+    <!-- 草稿恢复自动提示 -->
+    <div class="draft-notice" id="draft-notice">
+      <span>已为你恢复上次未完成的填写草稿</span>
+      <span style="text-decoration: underline; cursor: pointer; color: #fff;" onclick="clearDraft()">清空</span>
+    </div>
+
     <form id="booking-form" onsubmit="event.preventDefault(); handleFormSubmit();">
       
       <!-- 问题 1: 专属昵称 -->
       <div class="form-group">
         <label class="question-label" for="q1-input">1. 专属昵称</label>
-        <p class="question-desc">希望哥哥平时怎么称呼你呢？（例如：宝宝、妹宝、小名，或者其他有特殊意义的称呼）</p>
-        <div class="nickname-preset">
-          <button type="button" class="preset-btn active" onclick="setNicknamePreset('宝宝', this)">宝宝</button>
-          <button type="button" class="preset-btn" onclick="setNicknamePreset('妹宝', this)">妹宝</button>
-          <button type="button" class="preset-btn" id="custom-nickname-trigger" onclick="enableCustomNickname(this)">自定义</button>
+        <p class="question-desc">你希望游自均在日常和对话中如何称呼你？</p>
+        <div class="preset-container">
+          <button type="button" class="preset-btn active" onclick="setPresetNickname('宝宝', this)">宝宝</button>
+          <button type="button" class="preset-btn" onclick="setPresetNickname('妹宝', this)">妹宝</button>
+          <button type="button" class="preset-btn" onclick="enableCustomNickname(this)">自定义</button>
         </div>
-        <input type="text" id="q1-input" class="form-input" value="宝宝" readonly>
+        <input type="text" id="q1-input" class="form-input" value="宝宝" placeholder="请输入你的专属昵称..." required>
       </div>
 
-      <!-- 问题 2: 日常作息 -->
+      <!-- 问题 2: 作息与时间 -->
       <div class="form-group">
         <label class="question-label" for="q2-input">2. 日常作息与陪伴时段</label>
-        <p class="question-desc">为了能在方便的时间出现，想了解一下你的大致作息。哥哥的营业时间为早10到晚10，可能会调整。</p>
-        <textarea id="q2-input" class="form-textarea" placeholder="填写你的作息规律..." required></textarea>
+        <p class="question-desc">你的日常作息习惯如何？通常在什么时段最希望有人陪伴或倾听？</p>
+        <textarea id="q2-input" class="form-textarea" placeholder="例如：夜猫子，通常晚上11点后比较空闲；或者早睡早起型..." required></textarea>
       </div>
 
-      <!-- 问题 3: 兴趣爱好 -->
+      <!-- 问题 3: 兴趣与话题 -->
       <div class="form-group">
-        <label class="question-label" for="q3-input">3. 兴趣爱好与话题</label>
-        <p class="question-desc">可以分享你平时喜欢做什么吗？（电影/书籍/音乐/游戏/追剧，或者你最想聊的任何话题）</p>
-        <textarea id="q3-input" class="form-textarea" placeholder="分享一些你热衷的事..." required></textarea>
+        <label class="question-label" for="q3-input">3. 兴趣爱好与聊天话题</label>
+        <p class="question-desc">平时喜欢做些什么？有哪些你特别热衷、能聊很久的领域或小兴趣？</p>
+        <textarea id="q3-input" class="form-textarea" placeholder="例如：喜欢听深夜电台、看悬疑电影、猫咪、画画..." required></textarea>
       </div>
 
-      <!-- 问题 4: 心意惊喜 & 配送地址 -->
+      <!-- 问题 4: 惊喜偏好与地址 -->
       <div class="form-group">
-        <label class="question-label" for="q4-input">4. 心意小惊喜</label>
-        <p class="question-desc">会希望哥哥给你点外卖、送礼物吗？写下你的口味喜好（如喜欢的奶茶/零食/不喜欢的品牌等）。</p>
-        <textarea id="q4-input" class="form-textarea" placeholder="写下你的偏好..." required></textarea>
+        <label class="question-label" for="q4-input">4. 心意小惊喜与送达偏好</label>
+        <p class="question-desc">游自均可能会偶尔为你准备外卖小零食或深夜奶茶。如果有喜好或忌口请告诉我：</p>
+        <textarea id="q4-input" class="form-textarea" placeholder="喜好：少糖/不吃辣/喜欢黑咖啡..." required></textarea>
         
-        <!-- 配送地址输入区 -->
-        <div style="margin-top: 15px;" id="address-container">
-          <label class="question-label" style="font-size: 0.8rem; color: var(--text-secondary);">送货地址（本站不存后台，结单后即删）</label>
-          <input type="text" id="address-input" class="form-input" placeholder="输入地址（若需点外卖/礼物送达）">
+        <div id="address-container" style="margin-top: 12px; transition: var(--transition-smooth);">
+          <input type="text" id="address-input" class="form-input" placeholder="外卖送达地址（包含城市与门牌号）">
         </div>
-        
-        <!-- 优雅的“婉拒”选项 -->
+
         <label class="decline-option">
           <input type="checkbox" id="decline-address-checkbox" onchange="toggleAddressStatus(this)">
           <div class="custom-checkbox"></div>
@@ -593,11 +690,11 @@
         </label>
       </div>
 
-      <!-- 问题 5: 雷点避雷 -->
+      <!-- 问题 5: 雷点与避雷区 -->
       <div class="form-group">
         <label class="question-label" for="q5-input">5. 雷点 / 避雷区</label>
-        <p class="question-desc">为了相处更愉快，有哪些事是你会比较介意、需要我避开的？（任何不喜欢的称呼或沟通方式）</p>
-        <textarea id="q5-input" class="form-textarea" placeholder="写下你需要我注意的事避雷..." required></textarea>
+        <p class="question-desc">相处中有哪些你比较介意、讨厌或感到不适的话题/行为？（请务必告诉我）</p>
+        <textarea id="q5-input" class="form-textarea" placeholder="例如：讨厌被催促、不喜欢敷衍的回复..." required></textarea>
       </div>
 
       <!-- 问题 6: 陪伴模式 -->
@@ -607,10 +704,10 @@
         <textarea id="q6-input" class="form-textarea" placeholder="描述你向往的氛围..." required></textarea>
       </div>
 
-      <!-- 是否生成预约单 -->
+      <!-- 是否生成预约单 (已修复勾选交互) -->
       <label class="card-generation-toggle">
         <input type="checkbox" id="generate-booking-checkbox" checked>
-        <div class="custom-checkbox" style="margin-right: 10px;"></div>
+        <div class="custom-checkbox"></div>
         <span>同时生成信封预约确认单</span>
       </label>
 
@@ -668,154 +765,233 @@
         <div class="receipt-row-title">IDEAL MODE / 理想陪伴模式</div>
         <div class="receipt-row-value" id="r-q6"></div>
       </div>
+
+      <div class="receipt-footer">
+        <span>MONO-ARCHIVE-2026</span>
+        <span>YOU ZIJUN / 游自均</span>
+      </div>
     </div>
 
-    <!-- 模板二：预约卡（极简信封风） -->
+    <!-- 模板二：专线车票与招待信件 -->
     <div id="booking-template">
-      <div class="envelope-border">
-        <!-- 矢量邮戳 -->
-        <svg class="postmark-svg" viewBox="0 0 100 100" fill="none" stroke="#8a8882" stroke-width="0.8">
-          <circle cx="50" cy="50" r="45" stroke-dasharray="2,2"/>
-          <circle cx="50" cy="50" r="40"/>
-          <path d="M15 50h70M50 15v70" stroke-dasharray="1,2"/>
-          <text x="50" y="44" font-size="6" text-anchor="middle" font-family="Cinzel" letter-spacing="1">MONO ATELIER</text>
-          <text x="50" y="62" font-size="5" text-anchor="middle" font-family="Cinzel" letter-spacing="1.5">ACCEPTED</text>
-        </svg>
-        
-        <div class="envelope-header">POSTAGE CONFIRMED</div>
-        
-        <div class="envelope-body">
-          <div class="envelope-to">Dear <span id="b-nickname"></span>,</div>
-          <div class="envelope-message">
-            您的问卷已妥帖收悉。你写的每一个字，我都已悉数存好。期待之后能更懂你，在每个平淡或特殊的日子里，关心着你的一切，履行我的守护使命。
+      <!-- 左联车票 -->
+      <div class="ticket-left">
+        <div>
+          <div class="ticket-header">EXPRESS TICKET</div>
+          <div class="ticket-route">
+            <div class="ticket-station">南方多雨城市</div>
+            <div class="ticket-arrow">───────►</div>
+            <div class="ticket-station" id="b-nickname">宝宝</div>
           </div>
         </div>
-        
-        <div class="envelope-footer">
-          <!-- 极简火漆印 SVG -->
-          <svg class="wax-seal-svg" viewBox="0 0 100 100" fill="none" stroke="#2b2b2b" stroke-width="1.5">
-            <path d="M50 15c-19.3 0-35 15.7-35 35s15.7 35 35 35 35-15.7 35-35-15.7-35-35-35zm0 5c16.6 0 30 13.4 30 30S66.6 80 50 80 20 66.6 20 50s13.4-30 30-30z"/>
-            <path d="M38 50c4-8 8-12 12-12s8 4 12 12-8 12-12 12-8-4-12-12z" stroke-dasharray="1,1"/>
-            <text x="50" y="54" font-size="12" text-anchor="middle" font-family="Cinzel" fill="#2b2b2b">M</text>
-          </svg>
-          
-          <div class="envelope-signature">
-            游自均
-            <span>MONO ATELIER</span>
+        <div>
+          <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); letter-spacing: 1px;">CARRIER: MONO-01</div>
+          <div class="ticket-barcode">||| | ||||| | ||| ||</div>
+        </div>
+      </div>
+
+      <!-- 右联招待信 -->
+      <div class="ticket-right">
+        <div>
+          <div class="letter-title">INVITATION / 陪伴邀约确认信</div>
+          <div class="letter-body">
+            收到了你的问卷档案。你的每一个习惯与小偏好，我都已经认真记下了。<br>
+            在这个多雨的城市里，能听见你的声音是件很幸运的事。<br><br>
+            期待与你的每一次相遇与交流。
           </div>
         </div>
+        <div class="letter-signature">
+          —— 游自均 (You Zijun)
+        </div>
+
+        <!-- 火漆印戳 -->
+        <div class="wax-seal">M</div>
       </div>
     </div>
 
   </div>
-
 
   <!-- ==========================================================================
        6. 结果模态弹窗（展示生成好的图片并允许保存）
        ========================================================================== -->
-  <div class="modal-overlay" id="result-modal">
+  <div class="modal-backdrop" id="result-modal">
     <div class="modal-content">
-      <header class="modal-header">
-        <h3 class="modal-title">预约确认信息生成成功</h3>
-        <p class="modal-desc">请长按或右键保存下方图片发给哥哥确认预约哦</p>
-      </header>
+      <h3 class="modal-title">预约确认信息生成成功</h3>
+      <p class="modal-subtitle">已为你精致排版，请长按图片保存或分享</p>
 
       <div class="output-gallery" id="output-gallery">
-        <!-- 动态渲染的图片会插入到这里 -->
+        <!-- 动态生成的 PNG 图片将被插入到这里 -->
       </div>
 
-      <button class="close-modal-btn" onclick="closeModal()">返回修改</button>
+      <button class="close-modal-btn" onclick="closeModal()">关闭弹窗</button>
     </div>
   </div>
 
-
   <!-- ==========================================================================
-       7. 问卷逻辑控制脚本
+       7. 交互逻辑与 localStorage 自动草稿保存
        ========================================================================== -->
   <script>
-    // --- 1. 专属昵称快捷切换选择器 ---
-    const q1Input = document.getElementById('q1-input');
-    const customTrigger = document.getElementById('custom-nickname-trigger');
+    const DRAFT_KEY = 'mono_survey_draft_v1';
 
-    function setNicknamePreset(name, btn) {
-      // 恢复输入框为只读，填入预设值
+    const q1Input = document.getElementById('q1-input');
+    const q2Input = document.getElementById('q2-input');
+    const q3Input = document.getElementById('q3-input');
+    const q4Input = document.getElementById('q4-input');
+    const addressInput = document.getElementById('address-input');
+    const q5Input = document.getElementById('q5-input');
+    const q6Input = document.getElementById('q6-input');
+    const declineAddressCheckbox = document.getElementById('decline-address-checkbox');
+    const generateBookingCheckbox = document.getElementById('generate-booking-checkbox');
+
+    // --- 1. 昵称预设切换 ---
+    function setPresetNickname(name, btn) {
       q1Input.value = name;
       q1Input.readOnly = true;
-      
-      // 更新选择按钮样式
       document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      saveDraft();
     }
 
     function enableCustomNickname(btn) {
-      // 解锁输入框允许用户自定义输入
       q1Input.value = "";
       q1Input.readOnly = false;
       q1Input.focus();
-      
-      // 更新选择按钮样式
       document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      saveDraft();
     }
 
     // --- 2. 惊喜地址的温柔婉拒状态切换 ---
-    const addressInput = document.getElementById('address-input');
     const addressContainer = document.getElementById('address-container');
 
     function toggleAddressStatus(checkbox) {
       if (checkbox.checked) {
         addressInput.value = "地址暂且保密，心意已经收到啦";
         addressInput.disabled = true;
-        addressContainer.style.opacity = "0.4"; // 视觉上置灰
+        addressContainer.style.opacity = "0.4";
       } else {
-        addressInput.value = "";
+        if (addressInput.value === "地址暂且保密，心意已经收到啦") {
+          addressInput.value = "";
+        }
         addressInput.disabled = false;
         addressContainer.style.opacity = "1";
       }
+      saveDraft();
     }
 
-    // --- 3. 核心表单提交与 PNG 卡片渲染 ---
+    // --- 3. 自动草稿保存与恢复机制 (localStorage) ---
+    function saveDraft() {
+      const draftData = {
+        q1: q1Input.value,
+        q2: q2Input.value,
+        q3: q3Input.value,
+        q4: q4Input.value,
+        address: addressInput.value,
+        q5: q5Input.value,
+        q6: q6Input.value,
+        declineAddress: declineAddressCheckbox.checked,
+        generateBooking: generateBookingCheckbox.checked,
+        presetActiveIndex: Array.from(document.querySelectorAll('.preset-btn')).findIndex(b => b.classList.contains('active'))
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+    }
+
+    function loadDraft() {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (!saved) return;
+      try {
+        const draft = JSON.parse(saved);
+        if (draft.q1 !== undefined) q1Input.value = draft.q1;
+        if (draft.q2 !== undefined) q2Input.value = draft.q2;
+        if (draft.q3 !== undefined) q3Input.value = draft.q3;
+        if (draft.q4 !== undefined) q4Input.value = draft.q4;
+        if (draft.address !== undefined) addressInput.value = draft.address;
+        if (draft.q5 !== undefined) q5Input.value = draft.q5;
+        if (draft.q6 !== undefined) q6Input.value = draft.q6;
+        
+        if (draft.declineAddress !== undefined) {
+          declineAddressCheckbox.checked = draft.declineAddress;
+          toggleAddressStatus(declineAddressCheckbox);
+        }
+
+        if (draft.generateBooking !== undefined) {
+          generateBookingCheckbox.checked = draft.generateBooking;
+        }
+
+        if (draft.presetActiveIndex !== undefined && draft.presetActiveIndex !== -1) {
+          const btns = document.querySelectorAll('.preset-btn');
+          btns.forEach(b => b.classList.remove('active'));
+          if (btns[draft.presetActiveIndex]) {
+            btns[draft.presetActiveIndex].classList.add('active');
+            if (draft.presetActiveIndex !== 2) q1Input.readOnly = true;
+          }
+        }
+
+        // 显示恢复草稿提示
+        document.getElementById('draft-notice').classList.add('active');
+      } catch (e) {
+        console.error("恢复草稿失败:", e);
+      }
+    }
+
+    function clearDraft() {
+      localStorage.removeItem(DRAFT_KEY);
+      document.getElementById('booking-form').reset();
+      q1Input.value = "宝宝";
+      q1Input.readOnly = true;
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.preset-btn')[0].classList.add('active');
+      addressInput.disabled = false;
+      addressContainer.style.opacity = "1";
+      document.getElementById('draft-notice').classList.remove('active');
+    }
+
+    // 绑定所有 input 事件实时保存
+    document.querySelectorAll('#booking-form input, #booking-form textarea').forEach(elem => {
+      elem.addEventListener('input', saveDraft);
+      elem.addEventListener('change', saveDraft);
+    });
+
+    // 页面加载完成后自动还原草稿
+    window.addEventListener('DOMContentLoaded', loadDraft);
+
+
+    // --- 4. 核心表单提交与 PNG 卡片渲染 ---
     const submitBtn = document.getElementById('submit-btn');
 
     function handleFormSubmit() {
-      // 1. 按钮加载中视觉锁定
       submitBtn.disabled = true;
       submitBtn.textContent = "正在生成美学卡片...";
 
-      // 2. 获取表单数据
       const q1Val = q1Input.value.trim() || "宝宝";
-      const q2Val = document.getElementById('q2-input').value;
-      const q3Val = document.getElementById('q3-input').value;
-      const q4Val = document.getElementById('q4-input').value;
+      const q2Val = q2Input.value;
+      const q3Val = q3Input.value;
+      const q4Val = q4Input.value;
       const addressVal = addressInput.value.trim() || "未填写";
-      const q5Val = document.getElementById('q5-input').value;
-      const q6Val = document.getElementById('q6-input').value;
+      const q5Val = q5Input.value;
+      const q6Val = q6Input.value;
 
-      // 3. 将数据写入隐藏渲染模板中
+      // 数据填充至渲染模板
       document.getElementById('r-q1').textContent = q1Val;
       document.getElementById('r-q2').textContent = q2Val;
       document.getElementById('r-q3').textContent = q3Val;
-      
-      // 整合心意要求与地址
       document.getElementById('r-q4').innerHTML = `心意喜好：${q4Val}<br>收货地址：${addressVal}`;
       document.getElementById('r-q5').textContent = q5Val;
       document.getElementById('r-q6').textContent = q6Val;
-
       document.getElementById('b-nickname').textContent = q1Val;
 
-      // 4. 调用 html2canvas 逐个生成图片
       const promises = [];
       
-      // 必须生成的“问卷报告单”
+      // 1. 问卷档案卡片
       promises.push(
         html2canvas(document.getElementById('receipt-template'), {
-          scale: 2, // 提升图片清晰度，防止保存后模糊
+          scale: 2,
           useCORS: true
         })
       );
 
-      // 可选生成的“信封预约确认单”
-      const shouldGenerateBooking = document.getElementById('generate-booking-checkbox').checked;
+      // 2. 信封预约确认单（若勾选）
+      const shouldGenerateBooking = generateBookingCheckbox.checked;
       if (shouldGenerateBooking) {
         promises.push(
           html2canvas(document.getElementById('booking-template'), {
@@ -825,10 +1001,9 @@
         );
       }
 
-      // 5. 渲染完成后弹窗呈现
       Promise.all(promises).then(canvases => {
         const gallery = document.getElementById('output-gallery');
-        gallery.innerHTML = ''; // 清空上一轮渲染的内容
+        gallery.innerHTML = '';
 
         canvases.forEach((canvas, index) => {
           const wrapper = document.createElement('div');
@@ -839,28 +1014,24 @@
           
           const label = document.createElement('div');
           label.className = 'output-label';
-          label.textContent = index === 0 ? '【问卷单】长按图片保存' : '【预约确认信】长按图片保存';
+          label.textContent = index === 0 ? '【问卷档案卡】长按图片保存' : '【专线车票与招待信】长按图片保存';
 
           wrapper.appendChild(img);
           wrapper.appendChild(label);
           gallery.appendChild(wrapper);
         });
 
-        // 激活模态弹窗
         document.getElementById('result-modal').classList.add('active');
-        
-        // 恢复按钮状态
         submitBtn.disabled = false;
         submitBtn.textContent = "生成预约信息";
       }).catch(err => {
         console.error("生成失败:", err);
-        alert("卡片生成遇到了一点小插曲，请重试。");
+        alert("卡片生成遇到了一点小插曲，请重试（填写的草稿已被自动保存）。");
         submitBtn.disabled = false;
         submitBtn.textContent = "生成预约信息";
       });
     }
 
-    // 关闭模态弹窗
     function closeModal() {
       document.getElementById('result-modal').classList.remove('active');
     }
