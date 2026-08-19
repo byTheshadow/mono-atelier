@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REPO 买家秀生成器 | Mono Atelier</title>
+  
+  <!-- 引入衬线体与现代字体（Cinzel + Noto Serif SC + Plus Jakarta Sans） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;400;600;900&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- 引入 html2canvas 库，用于生成高清 PNG 图片 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. 页面基础样式（继承 mono-atelier 黑白毛玻璃暗黑视觉）
+       ========================================================================== */
+    :root {
+      --bg-dark: #08080a;
+      --card-bg: rgba(15, 15, 18, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --text-secondary: rgba(255, 255, 255, 0.5);
+      --accent-color: #ffffff;
+      --transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.92)), 
+                        url('https://s1.eisite.cn/autoupload/amqnh/20260817/jazZ/604X1200/adf5651d0d43725c55a41e57a4255cbb_%281%29.jpg/webp');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Plus Jakarta Sans', 'Noto Serif SC', serif;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    /* 返回主页按钮 */
+    .back-btn {
+      position: fixed;
+      top: 25px;
+      left: 25px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: var(--transition-smooth);
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateX(-3px);
+    }
+
+    .back-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-primary);
+      stroke-width: 2;
+    }
+
+    /* 主容器（响应式左右双栏布局） */
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 30px;
+      margin-top: 20px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 控制面板 Panel */
+    .control-panel {
+      background: rgba(12, 12, 15, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 30px 25px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      height: fit-content;
+    }
+
+    .panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      letter-spacing: 4px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .panel-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 15px;
+    }
+
+    .section-block {
+      margin-bottom: 25px;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-hint {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: normal;
+    }
+
+    /* ==========================================================================
+       2. 控制组件样式
+       ========================================================================== */
+    
+    /* 图片上传区 (支持最多6张) */
+    .upload-box {
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .upload-box:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .upload-icon {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text-secondary);
+      stroke-width: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .upload-text {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* 图片缩略图预览列表 */
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .thumb-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      background: #000;
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 16px;
+      height: 16px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 50%;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 大文本框 */
+    .large-textarea {
+      width: 100%;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      resize: vertical;
+      line-height: 1.6;
+      transition: var(--transition-smooth);
+    }
+
+    .large-textarea:focus {
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* 快捷颜文字栏 (Kaomoji Bar) */
+    .kaomoji-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .kaomoji-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+    }
+
+    .kaomoji-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-primary);
+    }
+
+    /* 模板与主题选择器 */
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      padding: 10px 6px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .opt-btn:hover, .opt-btn.active {
+      background: var(--text-primary);
+      color: var(--bg-dark);
+      border-color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* 动态控制选项行 */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .custom-switch {
+      width: 36px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+
+    .custom-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: var(--transition-smooth);
+    }
+
+    input:checked + .custom-switch {
+      background: #ffffff;
+    }
+
+    input:checked + .custom-switch::after {
+      transform: translateX(16px);
+      background: #08080a;
+    }
+
+    /* 导出生成按钮 */
+    .export-btn {
+      width: 100%;
+      background: var(--text-primary);
+      color: var(--bg-dark);
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .export-btn:hover {
+      background: rgba(255, 255, 255, 0.85);
+      transform: translateY(-2px);
+    }
+
+    /* ==========================================================================
+       3. 右侧实时预览画布 & 渲染模板区域 (Realtime Preview & Templates)
+       ========================================================================== */
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: sticky;
+      top: 40px;
+    }
+
+    .preview-header-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    /* 渲染卡片包装外壳 */
+    .card-preview-viewport {
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    /* 卡片共用样式 */
+    .repo-card {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: 'Noto Serif SC', serif;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    /* --- 暗黑 / 明亮主题颜色切换 --- */
+    .theme-dark {
+      background: #0d0d10;
+      color: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .theme-light {
+      background: #f7f7f9;
+      color: #121215;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    /* --- 1~6 张多图网格排版自适应 --- */
+    .photo-grid-render {
+      display: grid;
+      gap: 6px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .photo-grid-render.count-1 { grid-template-columns: 1fr; }
+    .photo-grid-render.count-2 { grid-template-columns: 1fr 1fr; }
+    .photo-grid-render.count-3, .photo-grid-render.count-4 { grid-template-columns: 1fr 1fr; }
+    .photo-grid-render.count-5, .photo-grid-render.count-6 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .photo-grid-item {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      background: rgba(128, 128, 128, 0.1);
+    }
+    
+    .photo-grid-render.count-1 .photo-grid-item {
+      aspect-ratio: 4 / 3;
+    }
+
+    /* --- 模板 A：拍立得记忆 (Polaroid Frame) --- */
+    .tpl-polaroid {
+      padding: 25px 25px 35px 25px;
+    }
+
+    .tpl-polaroid .polaroid-photo-frame {
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 20px;
+    }
+
+    .theme-light .tpl-polaroid .polaroid-photo-frame {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .tpl-polaroid .text-content {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+      font-weight: 300;
+    }
+
+    .tpl-polaroid .card-meta-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      padding-top: 15px;
+      font-size: 0.68rem;
+      opacity: 0.65;
+    }
+
+    .theme-light .tpl-polaroid .card-meta-footer {
+      border-top-color: rgba(0, 0, 0, 0.12);
+    }
+
+    /* 矢量压印钢印 (Vector Stamp) */
+    .stamp-seal {
+      width: 40px;
+      height: 40px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 1px;
+      opacity: 0.4;
+      transform: rotate(-12deg);
+    }
+
+    /* --- 模板 B：高级画廊展品 (Gallery Archive) --- */
+    .tpl-gallery {
+      padding: 40px 35px;
+    }
+
+    .tpl-gallery .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      opacity: 0.5;
+      margin-bottom: 25px;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 10px;
+    }
+
+    .tpl-gallery .text-content {
+      font-size: 0.88rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      margin-bottom: 25px;
+      text-align: justify;
+    }
+
+    .tpl-gallery .exhibition-label {
+      border: 1px solid currentColor;
+      padding: 15px 20px;
+      margin-top: 20px;
+      font-size: 0.72rem;
+      opacity: 0.85;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* --- 模板 C：信封嵌入式 (Envelope Slip) --- */
+    .tpl-envelope {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .tpl-envelope .envelope-top-flap {
+      height: 35px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .theme-light .tpl-envelope .envelope-top-flap {
+      background: rgba(0, 0, 0, 0.04);
+      border-bottom-color: rgba(0, 0, 0, 0.15);
+    }
+
+    /* 矢量火漆蜡印 Seal */
+    .envelope-wax {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      opacity: 0.6;
+      background: inherit;
+    }
+
+    .tpl-envelope .envelope-body {
+      padding: 30px 25px;
+    }
+
+    /* 矢量手写签名 (Signature Drop) */
+    .signature-box {
+      font-style: italic;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      text-align: right;
+      margin-top: 15px;
+      font-family: 'Cinzel', serif;
+    }
+
+    /* ==========================================================================
+       4. 结果导出弹窗 Modal
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: rgba(18, 18, 22, 0.95);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .output-img-wrapper {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      margin-bottom: 20px;
+    }
+
+    .output-img-wrapper img {
+      width: 100%;
+      display: block;
+    }
+
+    .close-modal-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      transition: var(--transition-smooth);
+    }
+
+    .close-modal-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 返回主页矢量按钮 -->
+  <button class="back-btn" onclick="location.href='./index.html'" title="返回主页">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+  </button>
+
+  <main class="app-container">
+    
+    <!-- 2. 左侧控制面板 (Control Panel) -->
+    <section class="control-panel">
+      <h1 class="panel-title">REPO GENERATOR</h1>
+      <p class="panel-subtitle">买家秀与反馈图文生成器</p>
+
+      <!-- 【板块一：多图上传 (1-6张)】 -->
+      <div class="section-block">
+        <div class="section-label">
+          <span>图片列表</span>
+          <span class="section-hint" id="photo-count-hint">0 / 6 张</span>
+        </div>
+        
+        <div class="upload-box" onclick="document.getElementById('file-input').click()">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <div class="upload-text">点击或拖拽上传图片（支持 1~6 张）</div>
+        </div>
+        <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+
+        <div class="thumb-grid" id="thumb-grid"></div>
+      </div>
+
+      <!-- 【板块二：反馈文案与颜文字】 -->
+      <div class="section-block">
+        <div class="section-label">评价 / 反馈小作文</div>
+        <textarea id="text-input" class="large-textarea" placeholder="在此写入买家反馈小作文或约单感言..." oninput="updatePreview()"></textarea>
+        
+        <!-- 快捷颜文字库 -->
+        <div class="section-label" style="margin-top: 12px; font-size: 0.72rem; color: var(--text-secondary);">
+          <span>快捷颜文字库（点击插入）</span>
+        </div>
+        <div class="kaomoji-bar">
+          <span class="kaomoji-item" onclick="insertKaomoji('( · _ · )')">( · _ · )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ˘ω˘ )')">( ˘ω˘ )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ′～` )')">( ′～` )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( _ _ )')">( _ _ )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ˙-˙ )')">( ˙-˙ )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ฅ\'ω\'ฅ )')">( ฅ'ω'ฅ )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ; _ ; )')">( ; _ ; )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( · ω · )')">( · ω · )</span>
+          <span class="kaomoji-item" onclick="insertKaomoji('( ◡‿◡ )')">( ◡‿◡ )</span>
+        </div>
+      </div>
+
+      <!-- 【板块三：模板与主题风格】 -->
+      <div class="section-block">
+        <div class="section-label">选择导出模板</div>
+        <div class="option-grid">
+          <div class="opt-btn active" onclick="switchTemplate('tpl-polaroid', this)">拍立得记忆</div>
+          <div class="opt-btn" onclick="switchTemplate('tpl-gallery', this)">高级画廊</div>
+          <div class="opt-btn" onclick="switchTemplate('tpl-envelope', this)">信封嵌入</div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-label">卡片色调风格</div>
+        <div class="option-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="opt-btn active" onclick="switchTheme('theme-dark', this)">深邃黑底</div>
+          <div class="opt-btn" onclick="switchTheme('theme-light', this)">高冷白底</div>
+        </div>
+
+        <!-- 矢量签名落款开关 -->
+        <label class="toggle-row">
+          <span>附带游自均矢量落款与印章</span>
+          <input type="checkbox" id="signature-toggle" checked onchange="updatePreview()" style="display:none;">
+          <div class="custom-switch"></div>
+        </label>
+      </div>
+
+      <!-- 导出生成按键 -->
+      <button type="button" class="export-btn" onclick="exportCardPNG()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        生成高清 PNG 卡片
+      </button>
+
+    </section>
+
+    <!-- 3. 右侧实时预览画布 (Live Preview Canvas) -->
+    <section class="preview-container">
+      <div class="preview-header-label">REALTIME PREVIEW / 实时渲染预览</div>
+
+      <div class="card-preview-viewport">
+        <!-- 核心 DOM 渲染区 -->
+        <div id="render-card" class="repo-card tpl-polaroid theme-dark">
+          
+          <!-- 模板 C 特有：信封口顶部 -->
+          <div class="envelope-top-flap" id="envelope-header" style="display: none;">
+            <div class="envelope-wax">M</div>
+          </div>
+
+          <div class="envelope-body" id="card-inner-body">
+            
+            <!-- 模板 B 特有：画廊顶部 Header -->
+            <div class="gallery-header" id="gallery-header" style="display: none;">
+              <span>MONO GALLERY</span>
+              <span id="render-serial-top">MONO-RP-0819</span>
+            </div>
+
+            <!-- 多图自适应渲染区 -->
+            <div class="polaroid-photo-frame" id="photo-frame-wrapper">
+              <div class="photo-grid-render count-1" id="render-photo-grid">
+                <!-- 占位默认图或上传图 -->
+                <img class="photo-grid-item" src="https://s1.eisite.cn/autoupload/amqnh/20260817/TXNi/736X736/184dbafc74311083d5fcda4c91b6e374.jpg/webp" alt="Mono Art">
+              </div>
+            </div>
+
+            <!-- 评价文案内容 -->
+            <div class="text-content" id="render-text">这是游自均的约单反馈卡片。感谢宝宝的信任与倾听，每一份陪伴都是南方多雨城市里最温暖的光影。 ( ˘ω˘ )</div>
+
+            <!-- 矢量签名与落款区 -->
+            <div class="signature-box" id="render-signature">
+              —— You Zijun (游自均)
+            </div>
+
+            <!-- 模板 B 特有：展品说明牌 -->
+            <div class="exhibition-label" id="gallery-label" style="display: none;">
+              <div>
+                <div style="font-weight:600; letter-spacing: 1px;">EXHIBIT: MONO REPO</div>
+                <div style="font-size:0.65rem; opacity:0.6;" id="render-date-label">DATE: 2026.08.19</div>
+              </div>
+              <div class="stamp-seal">MONO<br>STAMP</div>
+            </div>
+
+            <!-- 底部 Meta 元信息 (日期/随机编号/钢印) -->
+            <div class="card-meta-footer" id="card-meta-footer">
+              <div>
+                <div id="render-date">2026.08.19</div>
+                <div id="render-serial">NO. MONO-RP-8492</div>
+              </div>
+              <div class="stamp-seal">MONO<br>STAMP</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- 4. 生成结果展示弹窗 -->
+  <div class="modal-backdrop" id="result-modal">
+    <div class="modal-content">
+      <h3 class="modal-title">REPO 卡片生成成功</h3>
+      <p class="modal-subtitle">已为你精致排版，请长按图片保存或分享</p>
+
+      <div class="output-img-wrapper" id="output-wrapper"></div>
+
+      <button class="close-modal-btn" onclick="closeModal()">关闭弹窗</button>
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       5. JavaScript 核心交互与动态渲染脚本
+       ========================================================================== -->
+  <script>
+    // 状态管理
+    const state = {
+      images: [
+        "https://s1.eisite.cn/autoupload/amqnh/20260817/TXNi/736X736/184dbafc74311083d5fcda4c91b6e374.jpg/webp"
+      ],
+      template: 'tpl-polaroid',
+      theme: 'theme-dark',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      serial: 'MONO-RP-' + Math.floor(1000 + Math.random() * 9000)
+    };
+
+    // DOM 节点引用
+    const renderCard = document.getElementById('render-card');
+    const renderPhotoGrid = document.getElementById('render-photo-grid');
+    const renderText = document.getElementById('render-text');
+    const renderSignature = document.getElementById('render-signature');
+    const renderDate = document.getElementById('render-date');
+    const renderSerial = document.getElementById('render-serial');
+    const renderSerialTop = document.getElementById('render-serial-top');
+    const renderDateLabel = document.getElementById('render-date-label');
+    
+    const galleryHeader = document.getElementById('gallery-header');
+    const galleryLabel = document.getElementById('gallery-label');
+    const envelopeHeader = document.getElementById('envelope-header');
+    const cardMetaFooter = document.getElementById('card-meta-footer');
+    const photoFrameWrapper = document.getElementById('photo-frame-wrapper');
+
+    // 初始化运行
+    window.addEventListener('DOMContentLoaded', () => {
+      updatePreview();
+    });
+
+    // --- 1. 多图上传逻辑 (最多6张) ---
+    function handleImageUpload(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      const remainingSlots = 6 - state.images.length;
+      const filesToProcess = files.slice(0, remainingSlots);
+
+      filesToProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          state.images.push(e.target.result);
+          renderThumbsUI();
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function removeImage(index) {
+      state.images.splice(index, 1);
+      renderThumbsUI();
+      updatePreview();
+    }
+
+    function renderThumbsUI() {
+      const thumbGrid = document.getElementById('thumb-grid');
+      thumbGrid.innerHTML = '';
+      state.images.forEach((imgSrc, idx) => {
+        const item = document.createElement('div');
+        item.className = 'thumb-item';
+        item.innerHTML = `
+          <img src="${imgSrc}">
+          <div class="thumb-remove" onclick="removeImage(${idx})">×</div>
+        `;
+        thumbGrid.appendChild(item);
+      });
+      document.getElementById('photo-count-hint').textContent = `${state.images.length} / 6 张`;
+    }
+
+    // --- 2. 颜文字快捷插入 ---
+    function insertKaomoji(kaomoji) {
+      const textarea = document.getElementById('text-input');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const val = textarea.value;
+      textarea.value = val.substring(0, start) + ' ' + kaomoji + ' ' + val.substring(end);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + kaomoji.length + 2;
+      updatePreview();
+    }
+
+    // --- 3. 模板与主题切换 ---
+    function switchTemplate(tplName, btn) {
+      state.template = tplName;
+      document.querySelectorAll('.option-grid .opt-btn').forEach((b, i) => {
+        if (i < 3) b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      updatePreview();
+    }
+
+    function switchTheme(themeName, btn) {
+      state.theme = themeName;
+      btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updatePreview();
+    }
+
+    // --- 4. 核心 DOM 渲染更新引擎 ---
+    function updatePreview() {
+      // 更新卡片 Template Class & Theme Class
+      renderCard.className = `repo-card ${state.template} ${state.theme}`;
+
+      // 更新文本
+      const textVal = document.getElementById('text-input').value.trim();
+      renderText.textContent = textVal || "在此写入买家反馈小作文或约单感言...";
+
+      // 更新图片网格
+      renderPhotoGrid.innerHTML = '';
+      const count = Math.min(Math.max(state.images.length, 1), 6);
+      renderPhotoGrid.className = `photo-grid-render count-${count}`;
+
+      if (state.images.length === 0) {
+        // 无图时使用默认图
+        const img = document.createElement('img');
+        img.className = 'photo-grid-item';
+        img.src = 'https://s1.eisite.cn/autoupload/amqnh/20260817/TXNi/736X736/184dbafc74311083d5fcda4c91b6e374.jpg/webp';
+        renderPhotoGrid.appendChild(img);
+      } else {
+        state.images.forEach(src => {
+          const img = document.createElement('img');
+          img.className = 'photo-grid-item';
+          img.src = src;
+          renderPhotoGrid.appendChild(img);
+        });
+      }
+
+      // 更新日期与编号
+      renderDate.textContent = state.date;
+      renderSerial.textContent = `NO. ${state.serial}`;
+      renderSerialTop.textContent = state.serial;
+      renderDateLabel.textContent = `DATE: ${state.date}`;
+
+      // 签名落款开关
+      const showSig = document.getElementById('signature-toggle').checked;
+      renderSignature.style.display = showSig ? 'block' : 'none';
+
+      // 模板差异化处理
+      if (state.template === 'tpl-gallery') {
+        galleryHeader.style.display = 'flex';
+        galleryLabel.style.display = 'flex';
+        envelopeHeader.style.display = 'none';
+        cardMetaFooter.style.display = 'none';
+        photoFrameWrapper.style.padding = '0';
+      } else if (state.template === 'tpl-envelope') {
+        galleryHeader.style.display = 'none';
+        galleryLabel.style.display = 'none';
+        envelopeHeader.style.display = 'flex';
+        cardMetaFooter.style.display = 'flex';
+        photoFrameWrapper.style.padding = '0';
+      } else {
+        // 拍立得模板 A
+        galleryHeader.style.display = 'none';
+        galleryLabel.style.display = 'none';
+        envelopeHeader.style.display = 'none';
+        cardMetaFooter.style.display = 'flex';
+        photoFrameWrapper.style.padding = '12px';
+      }
+    }
+
+    // --- 5. 导出卡片 PNG 图形渲染 (html2canvas) ---
+    function exportCardPNG() {
+      const exportBtn = document.querySelector('.export-btn');
+      exportBtn.disabled = true;
+      exportBtn.textContent = '正在生成高精美学卡片...';
+
+      html2canvas(renderCard, {
+        scale: 2.5, // 高倍率防模糊
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
+        const outputWrapper = document.getElementById('output-wrapper');
+        outputWrapper.innerHTML = '';
+
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        outputWrapper.appendChild(img);
+
+        document.getElementById('result-modal').classList.add('active');
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          生成高清 PNG 卡片
+        `;
+      }).catch(err => {
+        console.error('导出卡片失败:', err);
+        alert('生成遇到了小插曲，请重试。');
+        exportBtn.disabled = false;
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('result-modal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
